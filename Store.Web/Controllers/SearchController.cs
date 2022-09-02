@@ -15,7 +15,7 @@ namespace Store.Web.Controllers
         }
 
 
-        // GET: SearchController
+        // GET: SearchController /search?query=title
         public ActionResult Index(string query)
         {
 

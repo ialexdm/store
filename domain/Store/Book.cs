@@ -5,6 +5,7 @@ namespace Store
     //entity
     public class Book
     {
+        //must be another type
         public int Id { get; }
 
         public string Title { get; }
@@ -12,13 +13,19 @@ namespace Store
         public string Isbn { get; }
         //Author must be a separate class and this field must be AuthorId
         public string Author { get; }
+        
+        public string Description { get; }
 
-        public Book(int id, string isbn, string author, string title)
+        public decimal Price { get; }   
+
+        public Book(int id, string isbn, string author, string title, string description, decimal price)
         {
             Id = id;
             Title = title;
             Isbn = isbn;
             Author = author;
+            Description = description;
+            Price = price;
         }
 
         internal static bool IsIsbn(string s)
@@ -29,8 +36,8 @@ namespace Store
                 .Replace("_", "")
                 .Replace(" ", "")
                 .ToUpper();
-
-            return Regex.IsMatch(s, @"^ISBN\d{10}(\d{3})?$");
+            bool isIsbn = Regex.IsMatch(s, @"^ISBN\d{10}(\d{3})?$");
+            return isIsbn;
         }
 
     }
