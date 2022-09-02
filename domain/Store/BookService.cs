@@ -19,7 +19,11 @@ namespace Store
         {
             if (Book.IsIsbn(query))
             {
-                return bookRepository.GetAllByIsbn(query);
+                string isbn = query.Replace(" ", "")
+                .Replace("-", "")
+                .Replace("_", "")
+                .ToUpper();
+                return bookRepository.GetAllByIsbn(isbn);
             }
             return bookRepository.GetAllByTitleOrAuthor(query);
         }
