@@ -19,7 +19,7 @@
                 @{
                     if(Context.Session.TryGetCart(out Cart cart) && cart.TotalCount > 0)
                     {
-                        <a href=""> Items @cart.TotalCount Amount @cart.TotalPrice</a>
+                        <a href="@Url.Action("Index", "Order")"> Items @cart.TotalCount Amount @cart.TotalPrice</a>
                     }
                     else
                     {
