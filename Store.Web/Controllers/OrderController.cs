@@ -39,14 +39,14 @@ namespace Store.Web.Controllers
 
         }
         [HttpPost]
-        public IActionResult RemoveItem(int id)
+        public IActionResult RemoveItem(int bookId)
         {
             (Order order, Cart cart) = GetOrCreateOrderAndCart();
 
-            order.RemoveItem(id);
+            order.RemoveItem(bookId);
             SaveOrderAndCart(order,cart);
 
-            return RedirectToAction("Index", "Book", new { id});
+            return RedirectToAction("Index", "Order", new { id = bookId });
         }
         [HttpPost]
         public IActionResult UpdateItem(int bookId, int count)
