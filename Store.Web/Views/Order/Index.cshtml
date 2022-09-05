@@ -26,8 +26,8 @@
                             <td>@Model.Items[i].Count</td>
                             <td>@Model.Items[i].Price</td>
                             <td class="form-inline">
-                                 <form class="form-inline" action="@Url.Action("RemoveItem", "Order")" method="post">
-                                 <input hidden="bookId" name="bookId" value="@Model.Items[i].BookId">
+                                 <form class="form-check-inline" action="@Url.Action("RemoveItem", "Order")" method="post">
+                                 <input type="hidden" name="bookId" value="@Model.Items[i].BookId">
                                  <button class="btn btn-danger" type="submit">Delete</button>
                                  </form>
                             </td>
@@ -39,10 +39,19 @@
             <td colspan="3" class="text-right">Total</td>
             <td class="text-right">@Model.TotalCount</td>
             <td class="text-right">@Model.TotalPrice</td>
-
-
-
-
         </tr>
     </tfoot>
 </table>
+
+<form action="@Url.Action("SendConfirmationCode")" method="post">
+    <input type="hidden" name="id" value="@Model.Id"/>
+    <div class="form-group">
+        <label for="cellPhone">Cell Phone</label>
+        <input type="text" class="form-control" name="cellPhone" value="+79876543210" />
+        @if (Model.Errors.ContainsKey("cellPhone"))
+        {
+            <small class="form-text text-danger">@Model.Errors["cellPhone"]</small>
+        }
+    </div>
+    <button type="submit" class="btn btn-success">Send code</button>
+</form>
