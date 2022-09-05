@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Store.Contractors;
 using Store.Messages;
 using Store.Web.Models;
 using System.Text.RegularExpressions;
@@ -9,16 +10,19 @@ namespace Store.Web.Controllers
     {
         private readonly IBookRepository bookRepository;
         private readonly IOrderRepository orderRepository;
-        private readonly INotificationService notificationService; 
+        private readonly INotificationService notificationService;
+        private readonly IEnumerable<IDeliveryService> deliveryServices;
 
         public OrderController(IBookRepository bookRepository
                             ,IOrderRepository orderRepository
                             ,INotificationService notificationService
+                            ,IEnumerable<IDeliveryService> deliveryServices
             )
         {
             this.bookRepository = bookRepository;
             this.orderRepository = orderRepository;
             this.notificationService = notificationService;
+            this.deliveryServices = deliveryServices;
         }
         [HttpGet]
         public IActionResult Index()
@@ -131,7 +135,7 @@ namespace Store.Web.Controllers
             return Regex.IsMatch(cellPhone, @"^\+?\d{11}$");
         }
         [HttpPost]
-        public IActionResult StartDelivery(int id, string cellPhone, int code)
+        public IActionResult Confirm(int id, string cellPhone, int code)
         {
             int? storeCode = HttpContext.Session.GetInt32(cellPhone);
             if (storeCode == null)
@@ -162,7 +166,19 @@ namespace Store.Web.Controllers
                     }); ;
             }
 
-            return View();
+            //TODO save CellPhone 
+
+            HttpContext.Session.Remove(cellPhone);
+
+            var model = new DeliveryModel
+            {
+                OrderId = id,
+                Methods = deliveryServices.ToDictionary(
+                    service => service.UniqueCode,
+                    service => service.Title)
+            };
+
+            return View("DeliveryMethod", model);
         }
 
         private OrderModel Map(Order order)
@@ -187,6 +203,30 @@ namespace Store.Web.Controllers
                 TotalCount = order.TotalCount,
                 TotalPrice = order.TotalPrice,
             };
+        }
+        [HttpPost]
+        public IActionResult StartDelivery (int id, string uniqueCode)
+        {
+            var deliveryService = deliveryServices.Single(service => service.UniqueCode == uniqueCode);
+            var order = orderRepository.GetById(id);
+
+            var form = deliveryService.CreateForm(order);
+            return View("DeliveryStep", form);
+
+        }
+        [HttpPost]
+        public IActionResult NextDelivery(int id, string uniqueCode, int step, Dictionary<string,string>  values)
+        {
+            var deliveryService = deliveryServices.Single(service => service.UniqueCode == uniqueCode);
+
+            var form = deliveryService.MoveNext(id, step, values);
+
+            if(form.IsFinal)
+            {
+                return null;
+            }
+
+            return View("DeliveryStep", form);
         }
     }
 }
