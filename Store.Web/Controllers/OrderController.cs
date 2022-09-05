@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Store.Messages;
 using Store.Web.Models;
+using System.Text.RegularExpressions;
 
 namespace Store.Web.Controllers
 {
@@ -7,14 +9,18 @@ namespace Store.Web.Controllers
     {
         private readonly IBookRepository bookRepository;
         private readonly IOrderRepository orderRepository;
+        private readonly INotificationService notificationService; 
 
         public OrderController(IBookRepository bookRepository
-                            ,IOrderRepository orderRepository)
+                            ,IOrderRepository orderRepository
+                            ,INotificationService notificationService
+            )
         {
             this.bookRepository = bookRepository;
             this.orderRepository = orderRepository;
+            this.notificationService = notificationService;
         }
-
+        [HttpGet]
         public IActionResult Index()
         {
             if (HttpContext.Session.TryGetCart(out Cart cart))
@@ -85,6 +91,78 @@ namespace Store.Web.Controllers
             }
 
             return (order, cart);
+        }
+
+
+        [HttpPost]
+        public IActionResult SendConfirmationCode(int id, string cellPhone)
+        {
+            var order = orderRepository.GetById(id);
+            var model = Map(order);
+
+            if(!IsValidCellPhone(cellPhone))
+            {
+                model.Errors["cellPhone"] = "Phone number isn't valid";
+                return View("Index",model);
+            }
+
+            int code = 1111;//random.Next(1000,10000)
+            HttpContext.Session.SetInt32(cellPhone,code);
+            notificationService.SendConfirmationCode(cellPhone, code);
+
+            return View("Confirmation",
+                new ConfirmationModel 
+                { 
+                    OrderId = id,
+                    CellPhone = cellPhone
+                });
+        }
+
+        private bool IsValidCellPhone(string cellPhone)
+        {
+            if(cellPhone == null)
+            {
+                return false;
+            }
+
+            cellPhone = cellPhone.Replace(" ", "")
+                .Replace("-", "");
+
+            return Regex.IsMatch(cellPhone, @"^\+?\d{11}$");
+        }
+        [HttpPost]
+        public IActionResult StartDelivery(int id, string cellPhone, int code)
+        {
+            int? storeCode = HttpContext.Session.GetInt32(cellPhone);
+            if (storeCode == null)
+            {
+                return View("Confirmation",
+                    new ConfirmationModel
+                    {
+                        OrderId = id,
+                        CellPhone = cellPhone,
+                        Errors = new Dictionary<string, string>
+                        {
+                            {"code", "Empty code, repeat sending" }
+                        },
+                    }); ;
+            }
+
+            if(storeCode != code)
+            {
+                return View("Confirmation",
+                    new ConfirmationModel
+                    {
+                        OrderId = id,
+                        CellPhone = cellPhone,
+                        Errors = new Dictionary<string, string>
+                        {
+                            {"code", "Is different than sended" }
+                        },
+                    }); ;
+            }
+
+            return View();
         }
 
         private OrderModel Map(Order order)
