@@ -14,6 +14,8 @@ namespace Store.Contractors
 
         Form CreateForm(Order order);
 
-        Form MoveNext(int orderId, int step, IReadOnlyDictionary<string, string> keyValuePairs);
+        Form MoveNextForm(int orderId, int step, IReadOnlyDictionary<string, string> keyValuePairs);
+
+        OrderDelivery GetDelivery(Form form);
     }
 }

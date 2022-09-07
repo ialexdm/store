@@ -20,6 +20,7 @@ builder.Services.AddSingleton<IOrderRepository, OrderRepository>();
 builder.Services.AddSingleton<BookService>();
 builder.Services.AddSingleton<INotificationService, DebugNotificationService>();
 builder.Services.AddSingleton<IDeliveryService, PostamateDeliveryService>();
+builder.Services.AddSingleton<IPaymentService, CashPaymentService>();
 
 
 var app = builder.Build();
