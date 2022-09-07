@@ -22,14 +22,14 @@ namespace Store.Contractors
                 "1",
                 new Dictionary<string, string>
                 {
-                    { "1", "Arbat" },
+                    {"1", "Arbat" },
                     {"2", "Novokosino" },
                     {"3", "Kazanskiy vokzal" }
                 } },
             {"2",
                 new Dictionary<string, string>
                 {
-                    { "4", "Nevskiy" },
+                    {"4", "Nevskiy" },
                     {"5", "Parnas" },
                     {"6", "Baltiyskiy vokzal" }
                 } },
@@ -71,7 +71,7 @@ namespace Store.Contractors
                     {
                         new HiddenField("City", "city", "2"),
 
-                        new SelectionField("Postamate", "postamate", "4", postamates["4"]),
+                        new SelectionField("Postamate", "postamate", "4", postamates["2"]),
                     });
                 }
                 else
