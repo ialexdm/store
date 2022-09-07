@@ -22,14 +22,14 @@ namespace Store.Contractors
                 "1",
                 new Dictionary<string, string>
                 {
-                    { "1", "Arbat" },
+                    {"1", "Arbat" },
                     {"2", "Novokosino" },
                     {"3", "Kazanskiy vokzal" }
                 } },
             {"2",
                 new Dictionary<string, string>
                 {
-                    { "4", "Nevskiy" },
+                    {"4", "Nevskiy" },
                     {"5", "Parnas" },
                     {"6", "Baltiyskiy vokzal" }
                 } },
@@ -40,6 +40,36 @@ namespace Store.Contractors
 
         public string Title => "Delivery by postamates in Moscow and S.Petersburg";
 
+        public OrderDelivery GetDelivery(Form form)
+        {
+            if (form.UniqueCode != UniqueCode || !form.IsFinal)
+            {
+                throw new InvalidOperationException("Invalid form");
+            }
+
+            var cityId = form
+                .Fields
+                .Single(field => field.Name == "city")
+                .Value;
+            var cityName = cities[cityId];
+
+            var postamateId = form
+                .Fields
+                .Single(field => field.Name == "postamate")
+                .Value;
+            var postamateName = postamates[cityId][postamateId];
+            var parameters = new Dictionary<string, string>
+            {
+                {nameof(cityId), cityId },
+                {nameof(cityName), cityName},
+                {nameof(postamateId), postamateId},
+                {nameof(postamateName), postamateName},
+            };
+
+            var description = $"City: {cityName}\nPostamate: {postamateName}";
+
+            return new OrderDelivery(UniqueCode, description, 150m, parameters);
+        }
         public Form CreateForm(Order order)
         {
             if (order == null)
@@ -52,7 +82,7 @@ namespace Store.Contractors
             });
         }
 
-        public Form MoveNext(int orderId, int step, IReadOnlyDictionary<string, string> values)
+        public Form MoveNextForm(int orderId, int step, IReadOnlyDictionary<string, string> values)
         {
             if (step == 1)
             {
@@ -71,7 +101,7 @@ namespace Store.Contractors
                     {
                         new HiddenField("City", "city", "2"),
 
-                        new SelectionField("Postamate", "postamate", "4", postamates["4"]),
+                        new SelectionField("Postamate", "postamate", "4", postamates["2"]),
                     });
                 }
                 else
