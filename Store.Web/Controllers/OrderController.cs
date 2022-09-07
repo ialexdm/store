@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Store.Contractors;
 using Store.Messages;
+using Store.Web.Contractors;
 using Store.Web.Models;
 using System.Text.RegularExpressions;
 
@@ -13,6 +14,7 @@ namespace Store.Web.Controllers
         private readonly INotificationService notificationService;
         private readonly IEnumerable<IDeliveryService> deliveryServices;
         private readonly IEnumerable<IPaymentService> paymentServices;
+        private readonly IEnumerable<IWebContractorService> webContractorServices;
 
 
         public OrderController(IBookRepository bookRepository
@@ -20,6 +22,7 @@ namespace Store.Web.Controllers
                             , INotificationService notificationService
                             , IEnumerable<IDeliveryService> deliveryServices
                             , IEnumerable<IPaymentService> paymentServices
+                            ,IEnumerable<IWebContractorService> webContractorServices
             )
         {
             this.bookRepository = bookRepository;
@@ -27,6 +30,7 @@ namespace Store.Web.Controllers
             this.notificationService = notificationService;
             this.deliveryServices = deliveryServices;
             this.paymentServices = paymentServices;
+            this.webContractorServices = webContractorServices;
         }
         [HttpGet]
         public IActionResult Index()
@@ -252,6 +256,12 @@ namespace Store.Web.Controllers
             var order = orderRepository.GetById(id);
 
             var form = paymentService.CreateForm(order);
+
+            var webContractorService = webContractorServices.SingleOrDefault(service => service.UniqueCode == uniqueCode);
+            if(webContractorService != null)
+            {
+                return Redirect(webContractorService.GetUri);
+            }
             return View("PaymentStep", form);
 
         }
@@ -273,6 +283,13 @@ namespace Store.Web.Controllers
             }
 
             return View("PaymentStep", form);
+        }
+
+        public IActionResult Finish()
+        {
+            HttpContext.Session.RemoveCart();
+
+            return View();
         }
     }
 }
