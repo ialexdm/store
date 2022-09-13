@@ -10,12 +10,7 @@ namespace Store
     {
         public int Id { get; set; }
 
-        private List<OrderItem> items;
-
-        public IReadOnlyCollection<OrderItem> Items
-        {
-            get { return items; }
-        }
+        public OrderItemCollection Items { get; }
 
         public string CellPhone { get; set; }
 
@@ -25,64 +20,16 @@ namespace Store
 
         public Order(int id, IEnumerable<OrderItem> items)
         {
-            if (items == null)
-            {
-                throw new ArgumentNullException(nameof(items));
-            }
             Id = id;
 
-            this.items = new List<OrderItem>(items);
+            Items = new OrderItemCollection(items);
         }
 
-        public int TotalCount => items.Sum(item => item.Count);
+        public int TotalCount => Items.Sum(item => item.Count);
 
 
-        public decimal TotalPrice => items.Sum(item => item.Price * item.Count )
+        public decimal TotalPrice => Items.Sum(item => item.Price * item.Count )
             + (Delivery?.Amount ?? 0m);
-
-
-        public OrderItem GetItem(int bookId)
-        {
-            int index = items.FindIndex(item => item.BookId == bookId);
-
-            if (index == -1)
-            {
-                ThrowBookException("Book not found.", bookId);
-            }
-
-            return items[index];
-        }
-
-        public void AddOrUpdateItem(Book book, int count)
-        {
-            //TODO Tests
-            if (book == null)
-            {
-                throw new ArgumentNullException(nameof(book));
-            }
-
-            int index = items.FindIndex(item => item.BookId == book.Id);
-            if (index == -1)
-            {
-                items.Add(new OrderItem(book.Id, count, book.Price));
-            }
-
-            else
-            {
-                items[index].Count += count;
-            }
-        }
-        public void RemoveItem(int bookId)
-        {
-            int index = items.FindIndex(item => item.BookId == bookId);
-
-            if (index == -1)
-            {
-                ThrowBookException("Order doesn't contain specified item.", bookId);
-            }
-
-            items.RemoveAt(index);
-        }
 
         private void ThrowBookException(string message, int bookId)
         {
