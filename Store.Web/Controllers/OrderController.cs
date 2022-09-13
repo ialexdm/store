@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Store.Contractors;
 using Store.Messages;
+using Store.Web.App;
 using Store.Web.Contractors;
 using Store.Web.Models;
 using System.Text.RegularExpressions;
@@ -87,9 +88,7 @@ namespace Store.Web.Controllers
         private void SaveOrderAndCart(Order order, Cart cart)
         {
             orderRepository.Update(order);
-
-            cart.TotalCount = order.TotalCount;
-            cart.TotalPrice = order.TotalPrice;
+            cart = new Cart(order.Id, order.TotalCount, order.TotalPrice);
 
             HttpContext.Session.Set(cart);
         }
@@ -106,7 +105,7 @@ namespace Store.Web.Controllers
             else
             {
                 order = orderRepository.Create();
-                cart = new Cart(order.Id);
+                cart = new Cart(order.Id, order.TotalCount, order.TotalPrice);
             }
 
             return (order, cart);
