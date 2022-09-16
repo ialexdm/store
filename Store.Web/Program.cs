@@ -10,17 +10,20 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+builder.Services.AddHttpContextAccessor();
 builder.Services.AddDistributedMemoryCache();
-builder.Services.AddSession(options => { 
+builder.Services.AddSession(options =>
+{
     options.IdleTimeout = TimeSpan.FromSeconds(20);
     options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true;
-   });
+});
 
 
 builder.Services.AddSingleton<IBookRepository, BookRepository>();
 builder.Services.AddSingleton<IOrderRepository, OrderRepository>();
 builder.Services.AddSingleton<BookService>();
+builder.Services.AddSingleton<OrderService>();
 builder.Services.AddSingleton<INotificationService, DebugNotificationService>();
 builder.Services.AddSingleton<IDeliveryService, PostamateDeliveryService>();
 builder.Services.AddSingleton<IPaymentService, CashPaymentService>();
@@ -47,9 +50,15 @@ app.UseAuthorization();
 
 app.UseSession();
 
-app.MapControllerRoute(
-    name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
-app.MapAreaControllerRoute(name: "yandex.kassa", areaName: "YandexKassa", pattern: "YandexKassa/{controller=Home}/{action=Index}/{id?}");
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapControllerRoute(
+        name: "areas",
+        pattern: "{area:exists}/{controller=Home}/{action=Index}/{id?}");
+
+    endpoints.MapControllerRoute(
+        name: "default",
+        pattern: "{controller=Home}/{action=Index}/{id?}");
+});
 
 app.Run();

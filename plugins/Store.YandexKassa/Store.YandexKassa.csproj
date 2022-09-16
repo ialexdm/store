@@ -8,6 +8,17 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Areas\YandexKassa\NewFolder1\**" />
+    <Compile Remove="Areas\YandexKassa\NewFolder2\**" />
+    <Content Remove="Areas\YandexKassa\NewFolder1\**" />
+    <Content Remove="Areas\YandexKassa\NewFolder2\**" />
+    <EmbeddedResource Remove="Areas\YandexKassa\NewFolder1\**" />
+    <EmbeddedResource Remove="Areas\YandexKassa\NewFolder2\**" />
+    <None Remove="Areas\YandexKassa\NewFolder1\**" />
+    <None Remove="Areas\YandexKassa\NewFolder2\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
 

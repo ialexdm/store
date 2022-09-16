@@ -16,7 +16,6 @@
     <ProjectReference Include="..\infrastructure\Store.Memory\Store.Memory.csproj" />
     <ProjectReference Include="..\plugins\Store.YandexKassa\Store.YandexKassa.csproj" />
     <ProjectReference Include="..\presentation\Store.Web.Contractors\Store.Web.Contractors.csproj" />
-    <ProjectReference Include="..\Store.Messages\Store.Messages.csproj" />
   </ItemGroup>
 
 </Project>
