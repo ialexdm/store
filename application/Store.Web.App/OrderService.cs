@@ -104,7 +104,7 @@ namespace Store.Web.App
             if (order.Items.TryGet(bookId, out OrderItem orderItem))
                 orderItem.Count += count;
             else
-                order.Items.Add(book.Id, count, book.Price);
+                order.Items.Add(book.Id, book.Price, count);
         }
 
         internal void UpdateSession(Order order)
